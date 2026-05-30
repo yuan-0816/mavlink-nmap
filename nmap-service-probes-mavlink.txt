@@ -1,0 +1,25 @@
+##############################NEXT PROBE##############################
+# MAVLink HEARTBEAT probe
+# ----------------------------------------------------------------------------
+# A MAVLink endpoint (autopilot / GCS) stays silent on stock UDP probes, so
+# Nmap reports 14550/udp as "open|filtered". This probe impersonates a drone
+# by sending a valid MAVLink v1 HEARTBEAT (sysid=1, compid=1, msg_id=0,
+# QUADROTOR/ARDUPILOTMEGA/ACTIVE, correct X.25 CRC). A live peer answers with a
+# MAVLink frame (0xFE for v1, 0xFD for v2). A peer that answers with sysid 255
+# is a Ground Control Station.
+#
+# Paste this whole block at the END of your nmap-service-probes file
+# (keep the "##...NEXT PROBE##" separator line).
+# ----------------------------------------------------------------------------
+Probe UDP MAVLink q|\xfe\x09\x00\x01\x01\x00\x00\x00\x00\x00\x02\x03\x00\x04\x03\xd0\x14|
+rarity 7
+ports 14550,14551,14552,14555,14556,14560
+
+# v1 frame: FE <len> <seq> <sysid> ...  -- sysid 255 == GCS
+match mavlink m|^\xfe[\x00-\xff][\x00-\xff]\xff| p/MAVLink ground control station/ i/v1, sysid 255/ cpe:/a:mavlink:mavlink/
+# v1 frame from any other system id (an autopilot, a relay, etc.)
+softmatch mavlink m|^\xfe| p/MAVLink v1 endpoint/
+
+# v2 frame: FD <len> <incompat> <compat> <seq> <sysid> ...  -- sysid 255 == GCS
+match mavlink m|^\xfd[\x00-\xff][\x00-\xff][\x00-\xff][\x00-\xff]\xff| p/MAVLink ground control station/ i/v2, sysid 255/ cpe:/a:mavlink:mavlink/
+softmatch mavlink m|^\xfd| p/MAVLink v2 endpoint/
