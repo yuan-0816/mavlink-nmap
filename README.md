@@ -7,8 +7,8 @@
 ### 安裝方式 (windows)
 #### 1. clone Repo
 ```
-git clone && cd mavlink-nmap
-```
+git clone https://github.com/yuan-0816/mavlink-nmap.git && cd mavlink-nmap
+``` 
 
 #### 2. 複製官方完整檔(注意:複製成沒有副檔名的 nmap-service-probes)
 ```
