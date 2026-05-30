@@ -26,5 +26,15 @@ nmap --script-updatedb
 
 ### 使用方式
 ```
-nmap -sUV -p- --datadir . --script .\mavlink-detect.nse <GCS_IP>
+# TCP 全 port + 標準/弱點腳本
+nmap -sS -sV -p- -T4 --script "default,vuln" <GCS IP>
+
+# UDP 全 port + MAVLink 偵測
+nmap -sU -sV -p- -T4 --datadir . --script "default,.\mavlink-detect.nse" <GCS IP>
 ```
+#### 參數說明
+```-sS```:TCP SYN 掃描
+```-sU```:UDP 掃描
+```-sV```:開啟版本偵測,當前目錄、自訂的 nmap-service-probes
+```--datadir .```:維持讀取當前目錄 probes / services。
+```--script "default,vuln,.\mavlink-detect.nse"```:同時跑 Nmap 內建的 default、vuln 類別腳本,外加 mavlink-detect.nse。
